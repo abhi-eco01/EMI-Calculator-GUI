@@ -1,0 +1,131 @@
+import tkinter as tk
+from tkinter import *
+from tkinter import messagebox
+from tkinter import ttk
+
+root = Tk()
+root.title("Loan Amortization Table")
+root.geometry("635x300")
+root.configure(bg="#489754")
+fr3 = tk.Frame(root)
+fr3.pack(expand=NO, fill='y')
+fr2 = tk.Frame(root, background="#326598")
+fr2.pack(expand=NO, fill='y')
+fr1 = tk.Frame(root, background="#489754")
+fr1.pack(expand=YES, fill=BOTH)
+
+welcome = tk.Label(fr3, text="Simple Loan Amortization Table Generator", font=("Cooper Std", 15, "bold"), fg="White",
+                   background="#389598")
+welcome.pack()
+
+var1 = tk.StringVar(fr2)
+var2 = tk.StringVar(fr2)
+var3 = tk.StringVar(fr2)
+
+amount = tk.Label(fr2, text="Loan Amount", font=("Cooper Std", 12, "bold"), fg="White", background="#326598")
+amount.grid(row=0, column=0, ipadx=5, ipady=5)
+e1 = tk.Entry(fr2, textvariable=var1)
+e1.grid(row=1, column=0, padx=5, pady=5)
+Rate = tk.Label(fr2, text="Interest Rate(%)", font=("Cooper Std", 12, "bold"), fg="White", background="#326598")
+Rate.grid(row=0, column=1)
+e2 = tk.Entry(fr2, textvariable=var2)
+e2.grid(row=1, column=1, padx=5, pady=5)
+tenur = tk.Label(fr2, text="Repayment Time\n(Years)", font=("Cooper Std", 12, "bold"), fg="White", background="#326598")
+tenur.grid(row=0, column=2)
+e3 = tk.Entry(fr2, textvariable=var3)
+e3.grid(row=1, column=2, padx=5, pady=5)
+totpay = tk.Label(fr2, text="Total Interest \n Payment", font=("Cooper Std", 12, "bold"), fg="White",
+                  background="#326598")
+totpay.grid(row=0, column=4)
+
+
+def data_entry(event):
+    var4 = (var1.get())
+    var5 = (var2.get())
+    var6 = (var3.get())
+    try:
+        int(var4) and float(var5) and int(var6)
+        a = int(var4)
+        b = float(var5)
+        c = int(var6)
+        m = (a * (b / 1200)) * (((1 + (b / 1200)) ** (c * 12)) / ((((1 + (b / 1200)) ** (c * 12))) - 1))
+        f = c * 12
+
+        p = [a, ]
+        d = []
+        h = []
+        for i in p:
+            p.append(round((i - (m - (i * (b / 1200)))), 2))
+            d.append(round((i * (b / 1200)), 2))
+            h.append(round((m - (i * (b / 1200))), 2))
+            if len(p) <= f:
+                pass
+            else:
+                break
+
+        g = p[0:-1]
+        o = range(1, ((c * 12) + 1))
+
+        data = list(zip(g, d, h, o))
+
+        global my_tree
+
+        my_tree = ttk.Treeview(fr1, selectmode="extended")
+        my_tree['columns'] = (
+            "Installment No.", "EMI", "Interest Payment", "Payment towards Principal", "Loan Amount Due")
+
+        my_tree.column("#0", anchor=CENTER, width=0, stretch=NO)
+        my_tree.column("Installment No.", anchor=CENTER, width=100)
+        my_tree.column("EMI", anchor=CENTER, width=120)
+        my_tree.column("Interest Payment", anchor=CENTER, width=120)
+        my_tree.column("Payment towards Principal", anchor=CENTER, width=180)
+        my_tree.column("Loan Amount Due", anchor=CENTER, width=120)
+
+        my_tree.heading("#0", text="", anchor=CENTER)
+        my_tree.heading("Installment No.", text="Installment No.", anchor=CENTER)
+        my_tree.heading("EMI", text="EMI", anchor=CENTER)
+        my_tree.heading("Interest Payment", text="Interest Payment", anchor=CENTER)
+        my_tree.heading("Payment towards Principal", text="Payment towards Principal", anchor=CENTER)
+        my_tree.heading("Loan Amount Due", text="Loan Amount Due", anchor=CENTER)
+
+        count = 0
+        for record in data:
+            my_tree.insert(parent='', index='end', iid=count, text=’’,
+                           values=(record[3], round(m, 2), record[1], record[2], record[0]))
+            count += 1
+
+        my_tree.pack(expand=YES, fill=BOTH)
+        global totpay1
+        totpay1 = tk.Label(fr2, text=str(round(((m * f) - a), 2)), font=("Cooper Std", 12, "bold"), fg="White",
+                           background="#326598")
+        totpay1.grid(row=1, column=4)
+        b1.config(state="disabled")
+
+    except:
+        tk.messagebox.showerror("Error in Input Data",
+                                "Please Enter proper Numbers,\nDecimal only allowed for Interest rate")
+
+
+
+
+b1 = ttk.Button(fr2, text="Calculate Loan \nAmortization Table ")
+b1.bind("<Button-1>", data_entry)
+b1.bind("<Return>", data_entry)
+b1.grid(row=0, column=3, sticky='se')
+
+
+def reset(event):
+    totpay1.destroy()
+    my_tree.destroy()
+
+    b1.config(state="enabled")
+
+
+
+
+b2 = ttk.Button(fr2, text="Reset")
+b2.bind("<Button-1>", reset)
+b2.bind("<Return>", reset)
+b2.grid(row=1, column=3, sticky='se')
+
+root.mainloop()
